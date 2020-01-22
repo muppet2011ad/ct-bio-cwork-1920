@@ -66,12 +66,27 @@ start = time.time()
 # To work with the printing functions below the best local alignment should be called best_alignment and its score should be called best_score.
 
 scorematrix = initMatrix(len(seq1) + 1, len(seq2) + 1)
-score(len(seq1), len(seq2), seq1, seq2, scorematrix)
+# score(len(seq1), len(seq2), seq1, seq2, scorematrix) # This approach doesn't work for large sequences because it hits recursion depth
 
 best_score = 0
 
+for i in range(0, len(scorematrix), 750):
+    for j in range(0, len(scorematrix[i]), 750):
+        score(i, j, seq1, seq2, scorematrix)
+
+for i in range(750 * (len(scorematrix) // 750), len(scorematrix)):
+    for j in range(0, len(seq2), 750):
+        score(i, j, seq1, seq2, scorematrix)
+
+for j in range(750 * (len(scorematrix[0])) % 750, len(scorematrix[0])):
+    for i in range(0, len(seq1), 750):
+        score(i, j, seq1, seq2, scorematrix)
+
+score(len(seq1), len(seq2), seq1, seq2, scorematrix)
+
 for i in range(len(scorematrix)):
     for j in range(len(scorematrix[i])):
+        # score(i,j,seq1,seq2,scorematrix)
         if scorematrix[i][j] > best_score:
             best_score = scorematrix[i][j]
 
