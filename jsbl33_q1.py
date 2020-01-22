@@ -54,7 +54,7 @@ def align(A,B,alignment):
     indexA = len(A) - 1
     stringB = ""
     indexB = len(B) - 1
-    for i in alignment:
+    for i in alignment[::-1]:
         if i == "0":
             stringA += A[indexA]
             indexA -= 1
@@ -68,7 +68,7 @@ def align(A,B,alignment):
             stringA += A[indexA]
             indexA -= 1
             stringB += "-"
-    return stringA,stringB
+    return stringA[::-1],stringB[::-1]
 
 
 
@@ -113,7 +113,6 @@ start = time.time()
 
 best_score, best_align_string = findAlignment(seq1,seq2)
 best_alignment = align(seq1,seq2,best_align_string)
-
 
 # -------------------------------------------------------------
 
