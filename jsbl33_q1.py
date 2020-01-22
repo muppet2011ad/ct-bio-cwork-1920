@@ -2,11 +2,73 @@
 import time
 import sys
 
+num_alignments = 0
 
-# YOUR FUNCTIONS GO HERE -------------------------------------
+def findAlignment(A,B):
+    global num_alignments
+    # Base case
+    if A == "" and B == "":
+        return 0, ""
+    # Match characters section
+    if A != "" and B != "":
+        matchDict = {"A": 3,
+                     "C": 2,
+                     "G": 1,
+                     "T": 2}
+        if A[-1] == B[-1]:
+            charScore = matchDict[A[-1]]
+        else:
+            charScore = -3
+        matchScore, matchAlign = findAlignment(A[:-1],B[:-1])
+        num_alignments += 1
+        matchAlign += "0"
+        matchScore += charScore
+    else:
+        matchAlign = ""
+        matchScore = sys.maxsize * -2 + 1
+    # Insert gap in A
+    if B != "":
+        gapAScore, gapAAlign = findAlignment(A,B[:-1])
+        num_alignments += 1
+        gapAAlign += "1"
+        gapAScore -= 4
+    else:
+        gapAAlign = ""
+        gapAScore = sys.maxsize * -2 + 1
+    # Insert gap in B
+    if A != "":
+        gapBScore, gapBAlign = findAlignment(A[:-1],B)
+        num_alignments += 1
+        gapBAlign += "2"
+        gapBScore -= 4
+    else:
+        gapBAlign = ""
+        gapBScore = sys.maxsize * -2 + 1
+    # Calculate best option
+    options = [[matchScore,matchAlign],[gapAScore,gapAAlign],[gapBScore,gapBAlign]]
+    best = max(options, key=lambda x: x[0])
+    return best
 
-
-# ------------------------------------------------------------
+def align(A,B,alignment):
+    stringA = ""
+    indexA = len(A) - 1
+    stringB = ""
+    indexB = len(B) - 1
+    for i in alignment:
+        if i == "0":
+            stringA += A[indexA]
+            indexA -= 1
+            stringB += B[indexB]
+            indexB -= 1
+        elif i == "1":
+            stringA += "-"
+            stringB += B[indexB]
+            indexB -= 1
+        elif i == "2":
+            stringA += A[indexA]
+            indexA -= 1
+            stringB += "-"
+    return stringA,stringB
 
 
 
@@ -49,7 +111,8 @@ start = time.time()
 # To work with the printing functions below the best alignment should be called best_alignment and its score should be called best_score. 
 # The number of alignments you have checked should be stored in a variable called num_alignments.
 
-
+best_score, best_align_string = findAlignment(seq1,seq2)
+best_alignment = align(seq1,seq2,best_align_string)
 
 
 # -------------------------------------------------------------
