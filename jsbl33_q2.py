@@ -3,12 +3,29 @@ import time
 import sys
 
 
-# YOUR FUNCTIONS GO HERE -------------------------------------
+def compareBases(a, b):
+    if a == b:
+        matchDict = {"A": 3,
+                     "C": 2,
+                     "G": 1,
+                     "T": 2}
+        return matchDict[a]
+    else:
+        return -3
 
 
+def initMatrix(rows, cols):
+    matrix = [[0 if j == 0 or i == 0 else None for j in range(cols)] for i in range(rows)]
+    return matrix
 
-# ------------------------------------------------------------
 
+def score(i, j, seq1, seq2, matrix):
+    if matrix[i][j] != None:
+        return matrix[i][j]
+    s = max(compareBases(seq1[i - 1], seq2[j - 1]) + score(i - 1, j - 1, seq1, seq2, matrix),
+            score(i - 1, j, seq1, seq2, matrix) - 2, score(i, j - 1, seq1, seq2, matrix) - 2, 0)
+    matrix[i][j] = s
+    return s
 
 
 # DO NOT EDIT ------------------------------------------------
@@ -46,9 +63,17 @@ start = time.time()
 
 # YOUR CODE GOES HERE ----------------------------------------
 # The sequences are contained in the variables seq1 and seq2 from the code above.
-# To work with the printing functions below the best local alignment should be called best_alignment and its score should be called best_score. 
+# To work with the printing functions below the best local alignment should be called best_alignment and its score should be called best_score.
 
+scorematrix = initMatrix(len(seq1) + 1, len(seq2) + 1)
+score(len(seq1), len(seq2), seq1, seq2, scorematrix)
 
+best_score = 0
+
+for i in range(len(scorematrix)):
+    for j in range(len(scorematrix[i])):
+        if scorematrix[i][j] > best_score:
+            best_score = scorematrix[i][j]
 
 #-------------------------------------------------------------
 
