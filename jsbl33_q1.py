@@ -5,8 +5,7 @@ import sys
 num_alignments = 0
 
 
-def findAlignment(A,
-                  B):  # Function find the alignment of the two string A and B (returns a list of actions that can be applied using align())
+def findAlignment(A, B):  # Function find the alignment of the two string A and B (returns a list of actions that can be applied using align())
     global num_alignments  # Make sure we access the global variable num_alignments
     # Base case
     if A == "" and B == "":

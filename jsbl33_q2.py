@@ -11,8 +11,7 @@ def compareBases(a, b):  # Function to get a score for matching bases
 
 
 def initMatrix(rows, cols):  # Function to initialise matrix
-    matrix = [[0 if j == 0 or i == 0 else None for j in range(cols)] for i in
-              range(rows)]  # Funky list comprehension to generate the matrix (this is faster than nested loops)
+    matrix = [[0 if j == 0 or i == 0 else None for j in range(cols)] for i in range(rows)]  # Funky list comprehension to generate the matrix (this is faster than nested loops)
     return matrix  # Return the generated matrix
 
 
@@ -26,15 +25,13 @@ def score(i, j, seq1, seq2, matrix):  # Recursive scoring function
     return s  # And returns it
 
 
-def align(seq1, seq2, matrix,
-          index):  # Function to calculate local alignment given two strings, a score matrix and the index of the highest value
+def align(seq1, seq2, matrix, index):  # Function to calculate local alignment given two strings, a score matrix and the index of the highest value
     i, j = index  # Unpacks the index (it should arrive as a two-value tuple or list)
     local_align1 = ""
     local_align2 = ""  # Create two strings to store the local alignment
     while i >= 1 and j >= 1 and matrix[i][
         j] != 0:  # While we haven't reached the edge of the matrix (that store the gap scores)
-        if matrix[i][j] - compareBases(seq1[i - 1], seq2[j - 1]) == matrix[i - 1][
-            j - 1]:  # If the difference in score indicates we got here by matching bases
+        if matrix[i][j] - compareBases(seq1[i - 1], seq2[j - 1]) == matrix[i - 1][j - 1]:  # If the difference in score indicates we got here by matching bases
             local_align1 = seq1[i-1] + local_align1
             local_align2 = seq2[j - 1] + local_align2  # Add a character to both local alignments
             i -= 1
