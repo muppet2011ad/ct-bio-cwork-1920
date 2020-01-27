@@ -96,8 +96,7 @@ for i in range(0, len(scorematrix), 750):  # Iterate through the matrix filling 
                    750):  # This seems really silly but CPython has a recursion depth limit of 1000, so I have to fill the matrix in like this
         score(i, j, seq1, seq2, scorematrix)
 
-for i in range(750 * (len(scorematrix) // 750),
-               len(scorematrix)):  # Now fill in all of the bottom rows that didn't get filled in (<750)
+for i in range(750 * (len(scorematrix) // 750), len(scorematrix)):  # Now fill in all of the bottom rows that didn't get filled in (<750)
     for j in range(0, len(seq2), 750):
         score(i, j, seq1, seq2, scorematrix)
 
