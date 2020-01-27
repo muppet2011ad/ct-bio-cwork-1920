@@ -23,20 +23,13 @@ def score(i, j, seq1, seq2, matrix):
     if matrix[i][j] != None:
         return matrix[i][j]
     s = max(compareBases(seq1[i - 1], seq2[j - 1]) + score(i - 1, j - 1, seq1, seq2, matrix),
-            score(i - 1, j, seq1, seq2, matrix) - 2, score(i, j - 1, seq1, seq2, matrix) - 2, 0)
+            score(i - 1, j, seq1, seq2, matrix) - 4, score(i, j - 1, seq1, seq2, matrix) - 4, 0)
     matrix[i][j] = s
     return s
 
-def align(seq1,seq2,matrix,score):
-    best_index = None
-    for i in range(len(matrix)):
-        if not best_index:
-            for j in range(len(matrix[i])):
-                if matrix[i][j] == score:
-                    best_index = (i,j)
-                    break
-        else:
-            break
+
+def align(seq1, seq2, matrix, score, index):
+    i, j = index
     local_align1 = ""
     local_align2 = ""
     i,j = best_index
@@ -46,14 +39,14 @@ def align(seq1,seq2,matrix,score):
             local_align2 = seq2[j-1] + local_align2
             i -= 1
             j -= 1
-        elif matrix[i][j] - 4 == matrix[i][j-1] or (matrix[i][j] - 4 < 0 and matrix[i][j-1] == 0):
+        elif matrix[i][j] == matrix[i][j - 1] - 4:
             local_align1 = "-" + local_align1
             local_align2 = seq2[j-1] + local_align2
-            i -= 1
-        elif matrix[i][j] - 4 == matrix[i-1][j] or (matrix[i][j] - 4 < 0 and matrix[i-1][j] == 0):
+            j -= 1
+        elif matrix[i][j] == matrix[i - 1][j] - 4:
             local_align1 = seq1[i-1] + local_align1
             local_align2 = "-" + local_align2
-            j -= 1
+            i -= 1
         else:
             print("REEE")
     return local_align1, local_align2
@@ -115,13 +108,16 @@ for j in range(750 * (len(scorematrix[0])) % 750, len(scorematrix[0])):
 
 score(len(seq1), len(seq2), seq1, seq2, scorematrix)
 
+best_index = None
+
 for i in range(len(scorematrix)):
     for j in range(len(scorematrix[i])):
-        # score(i,j,seq1,seq2,scorematrix)
         if scorematrix[i][j] > best_score:
             best_score = scorematrix[i][j]
+            best_index = (i, j)
+    print()
 
-best_alignment = align(seq1,seq2,scorematrix,best_score)
+best_alignment = align(seq1, seq2, scorematrix, best_score, best_index)
 
 #-------------------------------------------------------------
 
