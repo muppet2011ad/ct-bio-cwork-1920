@@ -27,6 +27,37 @@ def score(i, j, seq1, seq2, matrix):
     matrix[i][j] = s
     return s
 
+def align(seq1,seq2,matrix,score):
+    best_index = None
+    for i in range(len(matrix)):
+        if not best_index:
+            for j in range(len(matrix[i])):
+                if matrix[i][j] == score:
+                    best_index = (i,j)
+                    break
+        else:
+            break
+    local_align1 = ""
+    local_align2 = ""
+    i,j = best_index
+    while i > 1 and j > 1 and matrix[i][j] != 0:
+        if matrix[i][j] - compareBases(seq1[i-1],seq2[j-1]) == matrix[i-1][j-1]:
+            local_align1 = seq1[i-1] + local_align1
+            local_align2 = seq2[j-1] + local_align2
+            i -= 1
+            j -= 1
+        elif matrix[i][j] - 4 == matrix[i][j-1] or (matrix[i][j] - 4 < 0 and matrix[i][j-1] == 0):
+            local_align1 = "-" + local_align1
+            local_align2 = seq2[j-1] + local_align2
+            i -= 1
+        elif matrix[i][j] - 4 == matrix[i-1][j] or (matrix[i][j] - 4 < 0 and matrix[i-1][j] == 0):
+            local_align1 = seq1[i-1] + local_align1
+            local_align2 = "-" + local_align2
+            j -= 1
+        else:
+            print("REEE")
+    return local_align1, local_align2
+
 
 # DO NOT EDIT ------------------------------------------------
 # Given an alignment, which is two strings, display it
@@ -89,6 +120,8 @@ for i in range(len(scorematrix)):
         # score(i,j,seq1,seq2,scorematrix)
         if scorematrix[i][j] > best_score:
             best_score = scorematrix[i][j]
+
+best_alignment = align(seq1,seq2,scorematrix,best_score)
 
 #-------------------------------------------------------------
 
