@@ -7,6 +7,7 @@ num_alignments = 0
 
 def findAlignment(A, B):  # Function find the alignment of the two string A and B (returns a list of actions that can be applied using align())
     global num_alignments  # Make sure we access the global variable num_alignments
+    num_alignments += 1
     # Base case
     if A == "" and B == "":
         return 0, ""
@@ -17,7 +18,6 @@ def findAlignment(A, B):  # Function find the alignment of the two string A and 
         else:
             charScore = -3  # Otherwise score is -3
         matchScore, matchAlign = findAlignment(A[:-1], B[:-1])  # Score from taking this approach needs recursion
-        num_alignments += 1  # Increase number of alignments considered
         matchAlign += "0"  # Add the corresponding action (0 = match chars)
         matchScore += charScore  # Increase the score accordingly
     else:
@@ -26,7 +26,6 @@ def findAlignment(A, B):  # Function find the alignment of the two string A and 
     # Insert gap in A
     if B != "":
         gapAScore, gapAAlign = findAlignment(A, B[:-1])  # Get base score through recursion
-        num_alignments += 1  # Increment alignments
         gapAAlign += "1"  # Add action (1 = gap in A)
         gapAScore -= 4  # Decrease score by gap penalty
     else:
@@ -35,7 +34,6 @@ def findAlignment(A, B):  # Function find the alignment of the two string A and 
     # Insert gap in B
     if A != "":
         gapBScore, gapBAlign = findAlignment(A[:-1],B)
-        num_alignments += 1
         gapBAlign += "2"
         gapBScore -= 4
     else:
