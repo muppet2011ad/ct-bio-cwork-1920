@@ -4,34 +4,31 @@ import sys
 
 num_alignments = 0
 
-def findAlignment(A,B):
-    global num_alignments
+
+def findAlignment(A, B):  # Function find the alignment of the two string A and B (returns a list of actions that can be applied using align())
+    global num_alignments  # Make sure we access the global variable num_alignments
     # Base case
     if A == "" and B == "":
         return 0, ""
     # Match characters section
-    if A != "" and B != "":
-        matchDict = {"A": 3,
-                     "C": 2,
-                     "G": 1,
-                     "T": 2}
-        if A[-1] == B[-1]:
-            charScore = matchDict[A[-1]]
+    if A != "" and B != "":  # If we have two characters available
+        if A[-1] == B[-1]:  # If the two are equal
+            charScore = {"A": 3, "C": 2, "G": 1, "T": 2}[A[-1]]  # Get the appropriate score
         else:
-            charScore = -3
-        matchScore, matchAlign = findAlignment(A[:-1],B[:-1])
-        num_alignments += 1
-        matchAlign += "0"
-        matchScore += charScore
+            charScore = -3  # Otherwise score is -3
+        matchScore, matchAlign = findAlignment(A[:-1], B[:-1])  # Score from taking this approach needs recursion
+        num_alignments += 1  # Increase number of alignments considered
+        matchAlign += "0"  # Add the corresponding action (0 = match chars)
+        matchScore += charScore  # Increase the score accordingly
     else:
-        matchAlign = ""
-        matchScore = sys.maxsize * -2 + 1
+        matchAlign = ""  # If we can't do this alignment, it's impossible so set this to a blank
+        matchScore = sys.maxsize * -2 + 1  # Set the score to the lowest possible (this makes it impossible for it to be selected)
     # Insert gap in A
     if B != "":
-        gapAScore, gapAAlign = findAlignment(A,B[:-1])
-        num_alignments += 1
-        gapAAlign += "1"
-        gapAScore -= 4
+        gapAScore, gapAAlign = findAlignment(A, B[:-1])  # Get base score through recursion
+        num_alignments += 1  # Increment alignments
+        gapAAlign += "1"  # Add action (1 = gap in A)
+        gapAScore -= 4  # Decrease score by gap penalty
     else:
         gapAAlign = ""
         gapAScore = sys.maxsize * -2 + 1
@@ -45,30 +42,30 @@ def findAlignment(A,B):
         gapBAlign = ""
         gapBScore = sys.maxsize * -2 + 1
     # Calculate best option
-    options = [[matchScore,matchAlign],[gapAScore,gapAAlign],[gapBScore,gapBAlign]]
-    best = max(options, key=lambda x: x[0])
-    return best
+    options = [[matchScore, matchAlign], [gapAScore, gapAAlign], [gapBScore, gapBAlign]]  # Array to store options
+    best = max(options, key=lambda x: x[0])  # Finds the best option based on the score
+    return best  # Return that best option
 
 def align(A,B,alignment):
     stringA = ""
-    indexA = len(A) - 1
+    indexA = 0
     stringB = ""
-    indexB = len(B) - 1
-    for i in alignment[::-1]:
-        if i == "0":
+    indexB = 0  # Set up vars and start counting from end of string
+    for i in alignment:
+        if i == "0":  # If we need to take chars from both
             stringA += A[indexA]
-            indexA -= 1
+            indexA += 1
             stringB += B[indexB]
-            indexB -= 1
+            indexB += 1  # Do that
         elif i == "1":
             stringA += "-"
             stringB += B[indexB]
-            indexB -= 1
+            indexB += 1
         elif i == "2":
             stringA += A[indexA]
-            indexA -= 1
+            indexA += 1
             stringB += "-"
-    return stringA[::-1],stringB[::-1]
+    return stringA, stringB
 
 
 
