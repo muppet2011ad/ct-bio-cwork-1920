@@ -15,8 +15,7 @@ def findAlignment(A, B):  # Function find the alignment of the two string A and 
             charScore = {"A": 3, "C": 2, "G": 1, "T": 2}[A[-1]]  # Get the appropriate score
         else:
             charScore = -3  # Otherwise score is -3
-        matchScore, matchAlign, child_alignments = findAlignment(A[:-1], B[
-                                                                         :-1])  # Score from taking this approach needs recursion
+        matchScore, matchAlign, child_alignments = findAlignment(A[:-1], B[:-1])  # Score from taking this approach needs recursion
         matchAlign += "0"  # Add the corresponding action (0 = match chars)
         matchScore += charScore  # Increase the score accordingly
         alignments += child_alignments

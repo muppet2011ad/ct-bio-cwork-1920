@@ -92,8 +92,7 @@ scorematrix = initMatrix(len(seq1) + 1, len(seq2) + 1)  # Initialise the scorema
 best_score = -1  # Keep a variable to track the best score - it cannot be lower than zero
 
 for i in range(0, len(scorematrix), 750):  # Iterate through the matrix filling it in blocks of 750x750
-    for j in range(0, len(scorematrix[i]),
-                   750):  # This seems really silly but CPython has a recursion depth limit of 1000, so I have to fill the matrix in like this
+    for j in range(0, len(scorematrix[i]), 750):  # This seems really silly but CPython has a recursion depth limit of 1000, so I have to fill the matrix in like this
         score(i, j, seq1, seq2, scorematrix)
 
 for i in range(750 * (len(scorematrix) // 750), len(scorematrix)):  # Now fill in all of the bottom rows that didn't get filled in (<750)
