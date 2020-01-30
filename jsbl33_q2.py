@@ -15,16 +15,6 @@ def initMatrix(rows, cols):  # Function to initialise matrix
     return matrix  # Return the generated matrix
 
 
-def score(i, j, seq1, seq2, matrix):  # Recursive scoring function
-    if matrix[i][j] != None:  # Base case (we already have this score in the matrix)
-        return matrix[i][j]  # Return the cached value
-    s = max(compareBases(seq1[i - 1], seq2[j - 1]) + score(i - 1, j - 1, seq1, seq2, matrix),
-            score(i - 1, j, seq1, seq2, matrix) - 4, score(i, j - 1, seq1, seq2, matrix) - 4,
-            0)  # Calculates the score for all of the possible ways to get to this square and takes the maximum
-    matrix[i][j] = s  # Stores the calculate score in the matrix
-    return s  # And returns it
-
-
 def align(seq1, seq2, matrix, index):  # Function to calculate local alignment given two strings, a score matrix and the index of the highest value
     i, j = index  # Unpacks the index (it should arrive as a two-value tuple or list)
     local_align1 = ""
@@ -90,25 +80,13 @@ scorematrix = initMatrix(len(seq1) + 1, len(seq2) + 1)  # Initialise the scorema
 # score(len(seq1), len(seq2), seq1, seq2, scorematrix) # This approach doesn't work for large sequences because it hits recursion depth
 
 best_score = -1  # Keep a variable to track the best score - it cannot be lower than zero
-
-for i in range(0, len(scorematrix), 750):  # Iterate through the matrix filling it in blocks of 750x750
-    for j in range(0, len(scorematrix[i]), 750):  # This seems really silly but CPython has a recursion depth limit of 1000, so I have to fill the matrix in like this
-        score(i, j, seq1, seq2, scorematrix)
-
-for i in range(750 * (len(scorematrix) // 750), len(scorematrix)):  # Now fill in all of the bottom rows that didn't get filled in (<750)
-    for j in range(0, len(seq2), 750):
-        score(i, j, seq1, seq2, scorematrix)
-
-for j in range(750 * (len(scorematrix[0])) % 750, len(scorematrix[0])):  # Same for the columns
-    for i in range(0, len(seq1), 750):
-        score(i, j, seq1, seq2, scorematrix)
-
-score(len(seq1), len(seq2), seq1, seq2, scorematrix)  # Then we just fill in the last corner (a final block of < 750x750
-
-best_index = None  # Stores the index of the best score we find (we need it to align the variables
+best_index = (0, 0)
 
 for i in range(len(scorematrix)):
     for j in range(len(scorematrix[i])):  # Iterate through the matrix
+        if scorematrix[i][j] == None:
+            scorematrix[i][j] = max(compareBases(seq1[i - 1], seq2[j - 1]) + scorematrix[i - 1][j - 1], scorematrix[i - 1][j] - 4, scorematrix[i][j - 1] - 4,
+                                    0)  # Calculates the score for all of the possible ways to get to this square and takes the maximum
         if scorematrix[i][j] > best_score:  # If the entry at the given location is the best score we've seen yet
             best_score = scorematrix[i][j]  # Update the best_score variable to match
             best_index = (i, j)  # Update the index
