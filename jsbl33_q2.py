@@ -85,7 +85,11 @@ best_index = (0, 0)
 for i in range(len(scorematrix)):
     for j in range(len(scorematrix[i])):  # Iterate through the matrix
         if scorematrix[i][j] == None:
-            scorematrix[i][j] = max(compareBases(seq1[i - 1], seq2[j - 1]) + scorematrix[i - 1][j - 1], scorematrix[i - 1][j] - 4, scorematrix[i][j - 1] - 4,
+            if seq1[i - 1] == seq2[j - 1]:
+                matchScore = {"A": 3, "C": 2, "G": 1, "T": 2}[seq1[i - 1]]
+            else:
+                matchScore = -3
+            scorematrix[i][j] = max(matchScore + scorematrix[i - 1][j - 1], scorematrix[i - 1][j] - 4, scorematrix[i][j - 1] - 4,
                                     0)  # Calculates the score for all of the possible ways to get to this square and takes the maximum
         if scorematrix[i][j] > best_score:  # If the entry at the given location is the best score we've seen yet
             best_score = scorematrix[i][j]  # Update the best_score variable to match
