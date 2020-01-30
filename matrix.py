@@ -27,7 +27,7 @@ class Matrix(object):
 
     def __getitem__(self, key):
         row, col = key
-        return self.matrix[row, col]
+        return self.matrix[row][col]
 
     def __setitem__(self, key, value):
         row, col = key
