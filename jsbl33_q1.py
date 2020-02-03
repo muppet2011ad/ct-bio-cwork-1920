@@ -16,7 +16,7 @@ def findAlignment(A, B):  # Function find the alignment of the two string A and 
         else:
             charScore = -3  # Otherwise score is -3
         matchScore, matchAlign, child_alignments = findAlignment(A[:-1], B[:-1])  # Score from taking this approach needs recursion
-        matchAlign += "0"  # Add the corresponding action (0 = match chars)
+        matchAlign = "".join([matchAlign, "0"])  # Add the corresponding action (0 = match chars)
         matchScore += charScore  # Increase the score accordingly
         alignments += child_alignments
     else:
@@ -25,7 +25,7 @@ def findAlignment(A, B):  # Function find the alignment of the two string A and 
     # Insert gap in A
     if B != "":
         gapAScore, gapAAlign, child_alignments = findAlignment(A, B[:-1])  # Get base score through recursion
-        gapAAlign += "1"  # Add action (1 = gap in A)
+        gapAAlign = "".join([gapAAlign, "1"])  # Add action (1 = gap in A)
         gapAScore -= 4  # Decrease score by gap penalty
         alignments += child_alignments
     else:
@@ -34,7 +34,7 @@ def findAlignment(A, B):  # Function find the alignment of the two string A and 
     # Insert gap in B
     if A != "":
         gapBScore, gapBAlign, child_alignments = findAlignment(A[:-1], B)
-        gapBAlign += "2"
+        gapBAlign = "".join([gapBAlign, "2"])
         gapBScore -= 4
         alignments += child_alignments
     else:
