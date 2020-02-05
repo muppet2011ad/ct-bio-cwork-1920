@@ -32,7 +32,7 @@ class Matrix(object):
         string = ""
         for row in self.matrix:
             for value in row:
-                string += str(value) + "\t\t"
+                string += "{:6}".format(str(value))
             string += "\n"
         return string[:-1]
 
@@ -61,7 +61,7 @@ class NJMatrix(Matrix):
 
     def getQScores(self):
         r = self.m
-        qData = [[(r - 1) * self.matrix[a][b] - (self.rowsums[a] + self.rowsums[b]) if b > a else None for b in range(self.n)] for a in range(self.m)]
+        qData = [[(r - 1) * self.matrix[a][b] - (self.rowsums[a] + self.rowsums[b]) for b in range(self.n)] for a in range(self.m)]
         return Matrix(data=qData)
 
     def cluster(self):
@@ -80,21 +80,18 @@ class NJMatrix(Matrix):
         for i in range(0, self.m):
             self.matrix[i][a] = (self.distance(i, a) + self.distance(i, b) - self.distance(a, b)) / 2
         for j in range(0, self.n):
-            self.matrix[a][j] = (self.distance(b, j) + self.distance(j, b) - self.distance(a, b)) / 2
+            self.matrix[a][j] = (self.distance(a, j) + self.distance(b, j) - self.distance(a, b)) / 2  # This shit is broken
         self.removeRow(b)
         self.removeCol(b)
         self.sumRows()
 
     def distance(self, a, b):
-        if a > b:
-            return self.matrix[b][a]
-        else:
-            return self.matrix[a][b]
+        return self.matrix[a][b]
 
     def __str__(self):
         string = "\\\t\t" + "".join("{:6} ".format(header) for header in self.headers) + "\n"
         for i in range(len(self.matrix)):
-            string += self.headers[i] + "\t\t"
+            string += "{:6}".format(self.headers[i])
             for j in range(len(self.matrix[i])):
                 if self.matrix[i][j] is not None:
                     string += "{:6} ".format(str(self.matrix[i][j]))
@@ -114,9 +111,15 @@ def loadMatrix(filename):
         return NJMatrix(data=data, headers=headers)
 
 
-mat1 = loadMatrix("q3t2")
-print(mat1)
-mat1.cluster()
-print(mat1)
-mat1.cluster()
-print(mat1)
+def NJ(file):
+    matrix = loadMatrix(file)
+    while (matrix.m >= 2):
+        print("The similarity matrix is as follows:")
+        print(matrix)
+        matrix.cluster()
+        print("The associated qScores for this matrix are as follows:")
+        print(matrix.qMatrix)
+        print()
+
+
+NJ("q3t1")
