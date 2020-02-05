@@ -1,134 +1,124 @@
 import sys
 
 
-class Matrix(object):
-    def __init__(self, m=0, n=0, data=[]):
-        if data != []:
-            self.matrix = data
+class Matrix(object):  # Class for a normal matrix
+    def __init__(self, m=0, n=0, data=[]):  # Init method - it's best to define at least one of m/n and data otherwise you'll just get a 0x0 matrix
+        if data != []:  # If the data has been specified
+            self.matrix = data  # Take the array as the matrix
             self.m = len(data)
-            self.n = len(data[0])
-        else:
-            self.matrix = [[0 for j in range(n)] for i in range(m)]
+            self.n = len(data[0])  # Set m and n based on its dimensions
+        else:  # If no data has been specified
+            self.matrix = [[0 for j in range(n)] for i in range(m)]  # Create the matrix as the m*n zero matrix
             self.m = m
             self.n = n
 
-    def removeRow(self, x):
-        del self.matrix[x]
-        self.m -= 1
+    def removeRow(self, x):  # Function to remove a row
+        del self.matrix[x]  # Easy peasy lemon squeazy
+        self.m -= 1  # Decrement m
 
-    def removeCol(self, x):
-        self.matrix[:] = [i[:x] + i[x + 1:] for i in self.matrix]
-        self.n -= 1
+    def removeCol(self, x):  # Function to remove a column
+        self.matrix[:] = [i[:x] + i[x + 1:] for i in self.matrix]  # Cursed list comprehension recreates the matrix by list splicing each row to remove a column
+        self.n -= 1  # Decrement the row
 
-    def __getitem__(self, key):
-        row, col = key
-        return self.matrix[row][col]
+    def __getitem__(self, key):  # Function to override getting - not really used here
+        row, col = key  # Unpack the key (which should be a tuple or other iterable)
+        return self.matrix[row][col]  # Return the value in the matrix at that location
 
-    def __setitem__(self, key, value):
-        row, col = key
-        self.matrix[row][col] = value
+    def __setitem__(self, key, value):  # Function to override setting
+        row, col = key  # Unpack the key
+        self.matrix[row][col] = value  # Update the value
 
-    def __str__(self):
-        colwidths = [len(max([str(self.matrix[i][j]) for j in range(self.n)], key=lambda x: len(x))) for i in range(self.m)]
-        string = ""
-        for i in range(len(self.matrix)):
-            for j in range(len(self.matrix[i])):
-                if self.matrix[i][j] is not None:
-                    string += str(self.matrix[i][j]).rjust(colwidths[j]) + " "
-                else:
-                    string += "-".rjust(colwidths[j]) + " "
-            string += "\n"
-        return string[:-1]
-
-    def indexMin(self):
-        minval = 2 * sys.maxsize + 1
-        mindex = (0, 0)
-        for i in range(len(self.matrix)):
-            for j in range(len(self.matrix[i])):
-                if self.matrix[i][j] is not None:
-                    if self.matrix[i][j] < minval:
-                        mindex = (i, j)
-        return mindex
+    def __str__(self):  # Function to override string conversion (this gets used when printing)
+        colwidths = [len(max([str(self.matrix[i][j]) for j in range(self.n)], key=lambda x: len(x))) for i in range(self.m)]  # Cursed list comprehension to calculate the number of
+        # digits in each column of the matrix
+        string = ""  # Creates an empty string
+        for i in range(len(self.matrix)):  # Iterate over rows
+            for j in range(len(self.matrix[i])):  # Iterate over columns
+                if self.matrix[i][j] is not None:  # If entry isn't none
+                    string += str(self.matrix[i][j]).rjust(colwidths[j]) + " "  # Add the entry and right justify it (this lines up the columns)
+                else:  # Otherwise
+                    string += "-".rjust(colwidths[j]) + " "  # Add "-"
+            string += "\n"  # Add a newline at the end of the row
+        return string[:-1]  # Remove the final newline
 
 
-class NJMatrix(Matrix):
-    def __init__(self, m=0, n=0, data=[], headers=[]):
-        super().__init__(m, n, data)
-        self.sumRows()
-        if headers != []:
-            self.headers = headers
+class NJMatrix(Matrix):  # Class for a matrix supporting the neighbour joining algorithm (extends the Matrix class)
+    def __init__(self, m=0, n=0, data=[],
+                 headers=[]):  # Init is as before but with the extra optional parameter of headers. Not specifying the headers will cause the values 0-n to be used
+        super().__init__(m, n, data)  # Call the init method of the parent class
+        self.sumRows()  # Get the initial row sums
+        if headers != []:  # If headers has been defined
+            self.headers = headers  # Set the given headers as an attribute
         else:
-            self.headers = [str(i) for i in range(self.m)]
+            self.headers = [str(i) for i in range(self.m)]  # Create the headers as the numbers 0-n
 
-    def sumRows(self):
-        self.rowsums = [sum([val if val is not None else 0 for val in row]) for row in self.matrix]
+    def sumRows(self):  # Function to sum the rows of the matrix
+        self.rowsums = [sum(row) for row in self.matrix]  # List comprehension generates list of the sum of all rows
 
-    def getQScores(self):
-        r = self.m
+    def getQScores(self):  # Function to calculate q scores for the entire matrix
+        r = self.m  # Sets r as the size of the matrix
         qData = [[(r - 1) * self.matrix[a][b] - (self.rowsums[a] + self.rowsums[b]) if a != b else None for b in range(self.n)] for a in range(self.m)]
-        return Matrix(data=qData)
+        # List comprehension calculates q value for every value and fills in matrix, using None where we should have no qscore (i.e. when a == b)
+        return Matrix(data=qData)  # Return a matrix object containing the data
 
-    def cluster(self):
-        self.qMatrix = self.getQScores()
-        minval = 2 * sys.maxsize + 1
-        mindex = (0, 0)
+    def cluster(self):  # Method to perform a single step of the NJ algorithm
+        self.qMatrix = self.getQScores()  # Get a matrix of q scores
+        minval = 2 * sys.maxsize + 1  # Now we need to find a minimum of the matrix, so start with minval as a really big number
+        mindex = (0, 0)  # Placeholder value for index
         for i in range(len(self.qMatrix.matrix)):
-            for j in range(len(self.qMatrix.matrix[i])):
-                if j > i:
-                    if self.qMatrix[i, j] < minval:
-                        minval = self.qMatrix[i, j]
-                        mindex = (i, j)
-        a, b = mindex
-        self.headers[a] = self.headers[a] + self.headers[b]
-        del self.headers[b]
-        distAB = self.distance(a, b)
-        for i in range(0, self.m):
-            self.matrix[i][a] = (self.distance(i, a) + self.distance(i, b) - distAB) / 2
-            self.matrix[a][i] = self.matrix[i][a]
-        self.removeRow(b)
-        self.removeCol(b)
-        self.sumRows()
+            for j in range(i + 1, len(self.qMatrix.matrix[i])):  # Iterate over every element in the upper triangular but of the matrix
+                if self.qMatrix[i, j] < minval:  # If this is lower than anything we've seen before
+                    minval = self.qMatrix[i, j]  # Update the minimum value
+                    mindex = (i, j)  # Update the minimum index
+        a, b = mindex  # Unpack the minimum index
+        # Now we've identified the species that we need to cluster, we need to actually cluster them. I do this in-place, overwriting the data for species a with the new ab
+        self.headers[a] = self.headers[a] + self.headers[b]  # Combine the headers of the species (this can get long with combined species)
+        del self.headers[b]  # Delete b from the headers (we're about to shrink the matrix too)
+        distAB = self[a, b]  # Get the distance between a and b in the matrix (we need this in the calculation but it gets overwritten since we're working in-place, so we
+        # have to copy it.
+        for i in range(0, self.m):  # Iterate from 0 to m (since m == n as this should be a square matrix, we can iterate over both rows and columns)
+            self[i, a] = (self[i, a] + self[i, b] - distAB) / 2  # Calculate the new distances for the combined species
+            self[a, i] = self[i, a]  # Copy it into the lower triangular part of the matrix
+        self.removeRow(b)  # Remove row b
+        self.removeCol(b)  # Remove column b
+        self.sumRows()  # Update the rowsums with the new information in the matrix
 
-    def distance(self, a, b):
-        return self.matrix[a][b]
-
-    def __str__(self):
-        colwidths = [len(max([self.headers[i]] + [str(self.matrix[i][j]) for j in range(self.n)], key=lambda x: len(x))) for i in range(self.m)]
-        headcolwidth = len(max(self.headers, key=lambda x: len(x)))
-        string = "\\".rjust(headcolwidth) + " "
-        for i in range(self.m):
-            string += self.headers[i].rjust(colwidths[i]) + " "
-        string += "\n"
-        for i in range(len(self.matrix)):
-            string += self.headers[i].rjust(headcolwidth) + " "
-            for j in range(len(self.matrix[i])):
-                if self.matrix[i][j] is not None:
-                    string += str(self.matrix[i][j]).rjust(colwidths[j]) + " "
+    def __str__(self):  # Override of str() method
+        colwidths = [len(max([self.headers[i]] + [str(self[i, j]) for j in range(self.n)], key=lambda x: len(x))) for i in range(self.m)]
+        # Calculate the width each column needs to be using the most cursed of list comprehensions
+        headcolwidth = len(max(self.headers, key=lambda x: len(x)))  # Works out the width of the first column (of headers)
+        string = "\\".rjust(headcolwidth) + " "  # Places a backslash to mark the intersection of the row and column headers
+        for i in range(self.m):  # Iterate through the array's dimensions
+            string += self.headers[i].rjust(colwidths[i]) + " "  # Add the first row of headers to the string
+        string += "\n"  # Add a newline
+        for i in range(len(self.matrix)):  # Now iterate through the rows of the matrix
+            string += self.headers[i].rjust(headcolwidth) + " "  # Print the header for that row
+            for j in range(len(self.matrix[i])):  # Iterate through the row
+                if self.matrix[i][j] is not None:  # If the contents of the entry are defined
+                    string += str(self.matrix[i][j]).rjust(colwidths[j]) + " "  # Add the value of the entry to the string
                 else:
-                    string += "-".rjust(colwidths[j]) + " "
-            string += "\n"
-        return string[:-1]
+                    string += "-".rjust(colwidths[j]) + " "  # Add "-" to the string
+            string += "\n"  # Add a newline at the end of each row
+        return string[:-1]  # Remove the final newline
 
 
-def loadMatrix(filename):
-    with open(filename) as f:
-        lines = f.readlines()
-        headers = lines[0][1:].split()
-        data = []
-        for line in lines[1:]:
-            data.append([int(char) for char in line.split()[1:]])
-        return NJMatrix(data=data, headers=headers)
+def loadMatrix(filename):  # Function to load a matrix ready for NJ algorithm from a file
+    with open(filename) as f:  # Open the file
+        lines = f.readlines()  # Read out the lines of the file
+        headers = lines[0][1:].split()  # Load in the headers of the matrix (i.e. the names of the species)
+        data = [[int(char) for char in line.split()[1:]] for line in lines[1:]]  # Fetch the data using some cursed list comprehensions
+        return NJMatrix(data=data, headers=headers)  # Create an NJMatrix from the data loaded
 
 
-def NJ(file):
-    matrix = loadMatrix(file)
-    while (matrix.m >= 2):
+def NJ(file):  # Takes a filename and goes through the whole NJ algorithm
+    matrix = loadMatrix(file)  # Gets the NJ matrix from the file
+    while (matrix.m >= 2):  # Whilst the matrix is at least a 2x2
         print("The similarity matrix is as follows:")
-        print(matrix)
-        matrix.cluster()
+        print(matrix)  # Output the matrix
+        matrix.cluster()  # Go through a clustering step
         print("The associated qScores for this matrix are as follows:")
-        print(matrix.qMatrix)
-        print()
+        print(matrix.qMatrix)  # Output the calculated qscores
+        print()  # Leave a line
 
 
 NJ("boardexample")
