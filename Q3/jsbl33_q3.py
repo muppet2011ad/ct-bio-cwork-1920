@@ -29,10 +29,14 @@ class Matrix(object):
         self.matrix[row][col] = value
 
     def __str__(self):
+        colwidths = [len(max([str(self.matrix[i][j]) for j in range(self.n)], key=lambda x: len(x))) for i in range(self.m)]
         string = ""
-        for row in self.matrix:
-            for value in row:
-                string += "{:6}".format(str(value))
+        for i in range(len(self.matrix)):
+            for j in range(len(self.matrix[i])):
+                if self.matrix[i][j] is not None:
+                    string += str(self.matrix[i][j]).rjust(colwidths[j]) + " "
+                else:
+                    string += "-".rjust(colwidths[j]) + " "
             string += "\n"
         return string[:-1]
 
@@ -61,7 +65,7 @@ class NJMatrix(Matrix):
 
     def getQScores(self):
         r = self.m
-        qData = [[(r - 1) * self.matrix[a][b] - (self.rowsums[a] + self.rowsums[b]) for b in range(self.n)] for a in range(self.m)]
+        qData = [[(r - 1) * self.matrix[a][b] - (self.rowsums[a] + self.rowsums[b]) if a != b else None for b in range(self.n)] for a in range(self.m)]
         return Matrix(data=qData)
 
     def cluster(self):
@@ -77,10 +81,10 @@ class NJMatrix(Matrix):
         a, b = mindex
         self.headers[a] = self.headers[a] + self.headers[b]
         del self.headers[b]
+        distAB = self.distance(a, b)
         for i in range(0, self.m):
-            self.matrix[i][a] = (self.distance(i, a) + self.distance(i, b) - self.distance(a, b)) / 2
-        for j in range(0, self.n):
-            self.matrix[a][j] = (self.distance(a, j) + self.distance(b, j) - self.distance(a, b)) / 2  # This shit is broken
+            self.matrix[i][a] = (self.distance(i, a) + self.distance(i, b) - distAB) / 2
+            self.matrix[a][i] = self.matrix[i][a]
         self.removeRow(b)
         self.removeCol(b)
         self.sumRows()
@@ -89,14 +93,19 @@ class NJMatrix(Matrix):
         return self.matrix[a][b]
 
     def __str__(self):
-        string = "\\\t\t" + "".join("{:6} ".format(header) for header in self.headers) + "\n"
+        colwidths = [len(max([self.headers[i]] + [str(self.matrix[i][j]) for j in range(self.n)], key=lambda x: len(x))) for i in range(self.m)]
+        headcolwidth = len(max(self.headers, key=lambda x: len(x)))
+        string = "\\".rjust(headcolwidth) + " "
+        for i in range(self.m):
+            string += self.headers[i].rjust(colwidths[i]) + " "
+        string += "\n"
         for i in range(len(self.matrix)):
-            string += "{:6}".format(self.headers[i])
+            string += self.headers[i].rjust(headcolwidth) + " "
             for j in range(len(self.matrix[i])):
                 if self.matrix[i][j] is not None:
-                    string += "{:6} ".format(str(self.matrix[i][j]))
+                    string += str(self.matrix[i][j]).rjust(colwidths[j]) + " "
                 else:
-                    string += "{:6} ".format("-")
+                    string += "-".rjust(colwidths[j]) + " "
             string += "\n"
         return string[:-1]
 
@@ -107,7 +116,7 @@ def loadMatrix(filename):
         headers = lines[0][1:].split()
         data = []
         for line in lines[1:]:
-            data.append([int(char) for char in line[1:].split()])
+            data.append([int(char) for char in line.split()[1:]])
         return NJMatrix(data=data, headers=headers)
 
 
@@ -122,4 +131,4 @@ def NJ(file):
         print()
 
 
-NJ("q3t1")
+NJ("boardexample")
