@@ -17,8 +17,9 @@ class Matrix(object):  # Class for a normal matrix
         self.m -= 1  # Decrement m
 
     def removeCol(self, x):  # Function to remove a column
-        self.matrix[:] = [i[:x] + i[x + 1:] for i in self.matrix]  # Cursed list comprehension recreates the matrix by list splicing each row to remove a column
-        self.n -= 1  # Decrement the row
+        for i in range(self.m):
+            del self.matrix[i][x]
+        self.n -= 1
 
     def __getitem__(self, key):  # Function to override getting - not really used here
         row, col = key  # Unpack the key (which should be a tuple or other iterable)
