@@ -21,7 +21,7 @@ def findAlignment(A, B):  # Function find the alignment of the two string A and 
         alignments += child_alignments
     else:
         matchAlign = ""  # If we can't do this alignment, it's impossible so set this to a blank
-        matchScore = sys.maxsize * -2 + 1  # Set the score to the lowest possible (this makes it impossible for it to be selected)
+        matchScore = float("-inf")  # Set the score to the lowest possible (this makes it impossible for it to be selected)
     # Insert gap in A
     if B != "":
         gapAScore, gapAAlign, child_alignments = findAlignment(A, B[:-1])  # Get base score through recursion
@@ -30,7 +30,7 @@ def findAlignment(A, B):  # Function find the alignment of the two string A and 
         alignments += child_alignments
     else:
         gapAAlign = ""
-        gapAScore = sys.maxsize * -2 + 1
+        gapAScore = float("-inf")
     # Insert gap in B
     if A != "":
         gapBScore, gapBAlign, child_alignments = findAlignment(A[:-1], B)
@@ -39,7 +39,7 @@ def findAlignment(A, B):  # Function find the alignment of the two string A and 
         alignments += child_alignments
     else:
         gapBAlign = ""
-        gapBScore = sys.maxsize * -2 + 1
+        gapBScore = float("-inf")
     # Calculate best option
     options = [[matchScore, matchAlign], [gapAScore, gapAAlign], [gapBScore, gapBAlign]]  # Array to store options
     best = max(options, key=lambda x: x[0])  # Finds the best option based on the score

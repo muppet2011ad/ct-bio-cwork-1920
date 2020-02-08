@@ -1,6 +1,3 @@
-import sys
-
-
 class Matrix(object):  # Class for a normal matrix
     def __init__(self, m=0, n=0, data=[]):  # Init method - it's best to define at least one of m/n and data otherwise you'll just get a 0x0 matrix
         if data != []:  # If the data has been specified
@@ -64,7 +61,7 @@ class NJMatrix(Matrix):  # Class for a matrix supporting the neighbour joining a
 
     def cluster(self):  # Method to perform a single step of the NJ algorithm
         self.qMatrix = self.getQScores()  # Get a matrix of q scores
-        minval = 2 * sys.maxsize + 1  # Now we need to find a minimum of the matrix, so start with minval as a really big number
+        minval = float("inf")  # Now we need to find a minimum of the matrix, so start with minval as a really big number
         mindex = (0, 0)  # Placeholder value for index
         for i in range(len(self.qMatrix.matrix)):
             for j in range(i + 1, len(self.qMatrix.matrix[i])):  # Iterate over every element in the upper triangular but of the matrix
@@ -120,6 +117,3 @@ def NJ(file):  # Takes a filename and goes through the whole NJ algorithm
         print("The associated qScores for this matrix are as follows:")
         print(matrix.qMatrix)  # Output the calculated qscores
         print()  # Leave a line
-
-
-NJ("boardexample")
