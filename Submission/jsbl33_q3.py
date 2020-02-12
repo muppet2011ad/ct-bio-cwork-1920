@@ -1,3 +1,4 @@
+#!/usr/bin/python
 class Matrix(object):  # Class for a normal matrix
     def __init__(self, m=0, n=0, data=[]):  # Init method - it's best to define at least one of m/n and data otherwise you'll just get a 0x0 matrix
         if data != []:  # If the data has been specified
@@ -85,10 +86,11 @@ class NJMatrix(Matrix):  # Class for a matrix supporting the neighbour joining a
         colwidths = [len(max([self.headers[i]] + [str(self[i, j]) for j in range(self.n)], key=lambda x: len(x))) for i in range(self.m)]
         # Calculate the width each column needs to be using the most cursed of list comprehensions
         headcolwidth = len(max(self.headers, key=lambda x: len(x)))  # Works out the width of the first column (of headers)
+        sumcolwidth = len(max([str(s) for s in self.rowsums] + ["Sums"]))
         string = "\\".rjust(headcolwidth) + " "  # Places a backslash to mark the intersection of the row and column headers
         for i in range(self.m):  # Iterate through the array's dimensions
             string += self.headers[i].rjust(colwidths[i]) + " "  # Add the first row of headers to the string
-        string += "\n"  # Add a newline
+        string += "| Sums".rjust(sumcolwidth) + "\n"  # Add a newline
         for i in range(len(self.matrix)):  # Now iterate through the rows of the matrix
             string += self.headers[i].rjust(headcolwidth) + " "  # Print the header for that row
             for j in range(len(self.matrix[i])):  # Iterate through the row
@@ -96,7 +98,7 @@ class NJMatrix(Matrix):  # Class for a matrix supporting the neighbour joining a
                     string += str(self.matrix[i][j]).rjust(colwidths[j]) + " "  # Add the value of the entry to the string
                 else:
                     string += "-".rjust(colwidths[j]) + " "  # Add "-" to the string
-            string += "\n"  # Add a newline at the end of each row
+            string += "| " + str(self.rowsums[i]).rjust(sumcolwidth) + "\n"  # Add a newline at the end of each row
         return string[:-1]  # Remove the final newline
 
 

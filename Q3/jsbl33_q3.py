@@ -1,3 +1,4 @@
+#!/usr/bin/python
 class Matrix(object):  # Class for a normal matrix
     def __init__(self, m=0, n=0, data=[]):  # Init method - it's best to define at least one of m/n and data otherwise you'll just get a 0x0 matrix
         if data != []:  # If the data has been specified

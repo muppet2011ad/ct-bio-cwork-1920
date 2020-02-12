@@ -35,7 +35,8 @@ def align(seq1, seq2, matrix, index):  # Function to calculate local alignment g
             local_align2 = "-" + local_align2  # Add the gap in seq2
             i -= 1
         else:  # If we run into an error - we shouldn't get here with a correct scorematrix
-            print("REEE")  # Output it
+            print("Bruh moment - something went wrong.")
+            return local_align1, local_align2
     return local_align1, local_align2  # Return the two strings (these are compatible with display_alignment)
 
 

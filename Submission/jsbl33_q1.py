@@ -2,7 +2,6 @@
 import time
 import sys
 
-
 def findAlignment(A, B):  # Function find the alignment of the two string A and B (returns a list of actions that can be applied using align())
     alignments = 0
     # Base case
@@ -69,6 +68,7 @@ def align(A, B, alignment):
     return stringA, stringB
 
 
+
 # DO NOT EDIT ------------------------------------------------
 # Given an alignment, which is two strings, display it
 
@@ -85,7 +85,6 @@ def displayAlignment(alignment):
     print('String1: ' + string1)
     print('         ' + string3)
     print('String2: ' + string2 + '\n\n')
-
 
 # ------------------------------------------------------------
 
